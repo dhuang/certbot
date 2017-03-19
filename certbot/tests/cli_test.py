@@ -6,6 +6,7 @@ import tempfile
 
 import mock
 import six
+import zope.component
 from six.moves import reload_module  # pylint: disable=import-error
 
 from acme import challenges
@@ -13,6 +14,7 @@ from acme import challenges
 from certbot import cli
 from certbot import constants
 from certbot import errors
+from certbot import interfaces
 from certbot.plugins import disco
 
 PLUGINS = disco.PluginsRegistry.find_all()
@@ -44,6 +46,7 @@ class ParseTest(unittest.TestCase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
+        zope.component.provideUtility(self.mock_display, interfaces.IDisplay)
         reload_module(cli)
 
     @staticmethod
@@ -102,6 +105,7 @@ class ParseTest(unittest.TestCase):
         out = self._help_output(['-h'])
         self.assertTrue("letsencrypt-auto" not in out)  # test cli.cli_command
         if "nginx" in PLUGINS:
+            import pdb; pdb.set_trace() #XXX
             self.assertTrue("Use the Nginx plugin" in out)
         else:
             self.assertTrue("(the certbot nginx plugin is not" in out)

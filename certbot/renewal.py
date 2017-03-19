@@ -357,7 +357,8 @@ def _renew_describe_results(config, renew_successes, renew_failures,
 
     if config.quiet and not (renew_failures or parse_failures):
         return
-    print("\n".join(out))
+    notify = zope.component.getUtility(interfaces.IDisplay).notification
+    notify('\n'.join(out))
 
 
 def handle_renewal_request(config):

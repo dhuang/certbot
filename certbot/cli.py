@@ -11,6 +11,7 @@ import sys
 
 import configargparse
 import six
+import zope.component
 
 from acme import challenges
 
@@ -498,12 +499,13 @@ class HelpfulArgumentParser(object):
         else:
             apache_doc = "(the certbot apache plugin is not installed)"
 
+        notify = zope.component.getUtility(interfaces.IDisplay).notification
         usage = SHORT_USAGE
-        if help_arg == True:
-            print(usage + COMMAND_OVERVIEW % (apache_doc, nginx_doc) + HELP_USAGE)
+        if help_arg is True:
+            notify(usage + COMMAND_OVERVIEW % (apache_doc, nginx_doc) + HELP_USAGE)
             sys.exit(0)
         elif help_arg in self.COMMANDS_TOPICS:
-            print(usage + self._list_subcommands())
+            notify(usage + self._list_subcommands())
             sys.exit(0)
         elif help_arg == "all":
             # if we're doing --help all, the OVERVIEW is part of the SHORT_USAGE at

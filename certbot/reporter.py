@@ -8,6 +8,7 @@ import sys
 import textwrap
 
 from six.moves import queue  # type: ignore  # pylint: disable=import-error
+import zope.component
 import zope.interface
 
 from certbot import interfaces
@@ -81,13 +82,14 @@ class Reporter(object):
 
         """
         bold_on = False
+        notify = zope.component.getUtility(interfaces.IDisplay).notification
         if not self.messages.empty():
             no_exception = sys.exc_info()[0] is None
             bold_on = sys.stdout.isatty()
             if not self.config.quiet:
                 if bold_on:
-                    print(util.ANSI_SGR_BOLD)
-                print('IMPORTANT NOTES:')
+                    notify(util.ANSI_SGR_BOLD)
+                notify('IMPORTANT NOTES:')
             first_wrapper = textwrap.TextWrapper(
                 initial_indent=' - ',
                 subsequent_indent=(' ' * 3),
@@ -111,9 +113,9 @@ class Reporter(object):
                         sys.stdout.write(util.ANSI_SGR_RESET)
                         bold_on = False
                 lines = msg.text.splitlines()
-                print(first_wrapper.fill(lines[0]))
+                notify(first_wrapper.fill(lines[0]))
                 if len(lines) > 1:
-                    print("\n".join(
+                    notify("\n".join(
                         next_wrapper.fill(line) for line in lines[1:]))
         if bold_on and not self.config.quiet:
             sys.stdout.write(util.ANSI_SGR_RESET)

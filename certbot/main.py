@@ -498,12 +498,13 @@ def plugins_cmd(config, plugins):  # TODO: Use IDisplay rather than print
     """List server software plugins."""
     logger.debug("Expected interfaces: %s", config.ifaces)
 
+    notify = zope.component.getUtility(interfaces.IDisplay).notification
     ifaces = [] if config.ifaces is None else config.ifaces
     filtered = plugins.visible().ifaces(ifaces)
     logger.debug("Filtered plugins: %r", filtered)
 
     if not config.init and not config.prepare:
-        print(str(filtered))
+        notify(str(filtered))
         return
 
     filtered.init(config)
@@ -511,13 +512,13 @@ def plugins_cmd(config, plugins):  # TODO: Use IDisplay rather than print
     logger.debug("Verified plugins: %r", verified)
 
     if not config.prepare:
-        print(str(verified))
+        notify(str(verified))
         return
 
     verified.prepare()
     available = verified.available()
     logger.debug("Prepared plugins: %s", available)
-    print(str(available))
+    notify(str(available))
 
 
 def rollback(config, plugins):
